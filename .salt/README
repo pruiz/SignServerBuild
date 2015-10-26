@@ -1,0 +1,12 @@
+Development BackEnd Environment Setup
+=====================================
+
+This git repo contains scripts & salt state/pillar definitions
+usefull in order to setup (or upgrade) a development backend 
+host for evicertia's projects.
+
+Begin by boostrapping your host using: scripts/bootstrap.sh
+Then, apply states & changes using: scripts/apply-states.sh
+
+Regards
+Pablo
