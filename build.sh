@@ -3,27 +3,28 @@
 set -e
 
 declare -r -x SWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+declare -r -x SRCDIR="${SWD}/src"
 declare -r -x SOURCES="${SWD##*/}"
-declare -r -x PROJECT=Veritas
+declare -r -x PROJECT=SignServer
 declare BUILDDIR=${WORKSPACE}
 
 if [[ -z "${GIT_BRANCH}" ]]; then
-  if [[ -d "${SWD}/.git" ]]; then
-    GIT_BRANCH=$(cd "${SWD}"; git rev-parse --abbrev-ref HEAD)
+  if [[ -e "${SRCDIR}/.git" ]]; then
+    GIT_BRANCH=$(cd "${SRCDIR}"; git rev-parse --abbrev-ref HEAD)
   else
     GIT_BRANCH=unknown
   fi
 fi
 if [[ -z "${GIT_COMMIT}" ]]; then
-  if [[ -d "${SWD}/.git" ]]; then
-    GIT_COMMIT=$(cd "${SWD}"; git rev-parse HEAD)
+  if [[ -e "${SRCDIR}/.git" ]]; then
+    GIT_COMMIT=$(cd "${SRCDIR}"; git rev-parse HEAD)
   else
     GIT_COMMIT=0000000000000000000000000000000000000000
   fi
 fi
 if [[ -z "${GIT_REVNUM}" ]]; then
-  if [[ -d "${SWD}/.git" ]]; then
-    GIT_REVNUM=$(cd "${SWD}"; git rev-list HEAD|wc -l)
+  if [[ -e "${SRCDIR}/.git" ]]; then
+    GIT_REVNUM=$(cd "${SRCDIR}"; git rev-list HEAD|wc -l)
   else
     GIT_REVNUM=0
   fi
@@ -62,11 +63,7 @@ function is_vagrant ()
 }
 
 if [[ -z "${VERSION_TAG}" ]]; then
-  if is_vagrant; then
-    VERSION_TAG="0.0.0.0"
-  else
-    VERSION_TAG=$(date -u +%y%j.${GIT_REVNUM}.${BUILD_NUMBER:-0})
-  fi
+  VERSION_TAG=$(cat ${SWD}/src/signserver/res/compile.properties |grep ^app.version.number|cut -d= -f 2).${BUILD_NUMBER:-${GIT_REVNUM}}
 fi
 if [[ -z "${VERSION_STRING}" ]]; then
   VERSION_STRING=$(echo "${VERSION_TAG}-${GIT_COMMIT:0:9} (${GIT_BRANCH})")
@@ -78,14 +75,12 @@ function setup_vagrant_workspace ()
 
   BUILDDIR="${SWD}/.builddir"
 
-  pushd "${SWD}"
+  pushd "${SWD}/src"
 
   [ -d "${BUILDDIR}" ] && rm -rf "${BUILDDIR}"
-  mkdir -p "${BUILDDIR}/Sources"
+  mkdir -p "${BUILDDIR}"
   echo "Creating sources replica.."
-  ## XXX: Using 'git archive' here wont export non-commited changes.
-  #git archive --format tar HEAD| tar -xf - -C "${BUILDDIR}/Sources"
-  git ls-files | tar -cf - -T - | tar -xf - -C "${BUILDDIR}/Sources"
+  git ls-files | tar -cf - -T - | tar -xf - -C "${BUILDDIR}"
 
   popd
 }
@@ -102,33 +97,26 @@ function build ()
 
   pushd "${BUILDDIR}"
 
-  ## Clean up data (possibly) left by previous builds.
-  for i in $(ls |grep -v Sources|grep -v NuGets);do rm -rf "$i";done
- 
+  ## Setup some needed folders..
+  [ ! -d RPMS ]&& mkdir -p RPMS/noarch
+
+  SPECFILE=${SWD}/packaging/${PROJECT}.spec
+
   RESULT=0
 
-  echo "Setting version.."
-  #sed -i -e "s|0\.0\.0\.0|${VERSION_TAG}|g" Sources/*/Properties/AssemblyInfo.cs
   #sed -i -e "s|GIT_COMMIT|${VERSION_STRING}|g" Sources/*/Properties/AssemblyInfo.cs
 
-  cat > setenv.sh <<_EOF
-export JBOSS_HOME="/var/lib/jbossas" 
-export APPSRV_HOME=$JBOSS_HOME
-export ANT_HOME=/usr/share/ant
-export ANT_OPTS="-Xmx512m -XX:MaxPermSize=128m" 
-export SIGNSERVER_HOME=/opt/signserver
-export SIGNSERVER_NODEID=ssdemo.ter0.com
-_EOF
+  rpmbuild -bb \
+          --define "version $(echo ${VERSION_TAG}|rev|cut -d. -f 2-|rev)" \
+          --define "release $(echo ${VERSION_TAG}|rev|cut -d. -f -1|rev)" \
+          --define "_topdir ${BUILDDIR}" \
+          --define "_builddir ${BUILDDIR}/signserver" \
+	  --define "full_version_string ${VERSION_STRING}" \
+          --define 'setup echo "do nothing."' \
+          "$SPECFILE"
 
-  bin/ant clean
-  bin/ant build
-  bin/ant deploy
- 
   RESULT=$?
   
-  echo "Copying output artifacts.."
-  #mv RPMS/noarch/* Outputs/ || :
- 
   popd 
   exit $RESULT
 }

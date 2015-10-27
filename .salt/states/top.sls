@@ -5,3 +5,4 @@ base:
     - selinux
     - pkgrepos
     - salt
+    - jpackage
