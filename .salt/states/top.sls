@@ -6,3 +6,5 @@ base:
     - pkgrepos
     - salt
     - jpackage
+    - jboss
+    - signserver

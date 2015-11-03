@@ -1,0 +1,7 @@
+#
+#   File managed by salt, any changed made here will
+#   get lost upon next salt state alignment execution.
+#
+{% for key, value in properties.iteritems() -%}
+{{ key }} = {{ value }}
+{% endfor %}

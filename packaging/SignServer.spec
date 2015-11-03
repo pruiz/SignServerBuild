@@ -30,7 +30,8 @@ Group:          Productivity/Other
 Requires:	redhat-lsb-core
 Requires:	java-1.6.0-openjdk-devel
 Requires:	jpackage-utils
-Requires:	jbossas >= 5.1.0
+Requires:	jbossas >= 5.1.0, jbossas < 5.2.0
+Requires:	glassfish-javamail = 1.4.0
 BuildArch:	noarch
 Summary:	SignServer's server-side EAR files.
 
