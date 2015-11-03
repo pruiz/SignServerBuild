@@ -1,14 +1,32 @@
 
-{% macro application(
+{% macro deploy_link(
         name,
         data
     )
 %}
 
-{{ 'jboss-application:' ~ name }}:
+{{ 'jboss-deploy:' ~ name }}:
   file.symlink:
-    - name: /var/lib/jbossas/server/default/deploy/{{ salt['file.basename'](data.archive) }}
+    - name: /var/lib/jbossas/server/default/deploy/{{ name }}
     - target: {{ data.archive }}
+    - require:
+      - pkg: jbossas
+
+{% endmacro %}
+
+{% macro deploy_template(
+        name,
+        data
+    )
+%}
+
+{{ 'jboss-deploy:' ~ name }}:
+  file.managed:
+    - name: /var/lib/jbossas/server/default/deploy/{{ name }}
+    - source: {{ data.source }}
+{% for key,value in data.context|default({}).iteritems() %}
+      {{ key }}: {{ value|yaml }}
+{% endfor %}
     - require:
       - pkg: jbossas
 

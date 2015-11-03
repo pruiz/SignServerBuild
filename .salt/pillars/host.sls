@@ -10,6 +10,10 @@ packages:
     fromrepo: base,updates
   java-1.6.0-openjdk-devel:
     fromrepo: base,updates
+  glassfish-javamail:
+    fromrepo: jpackage-generic-free
+    requires:
+      - pkgrepo: pkgrepo-jpackage-generic-free
 
 jboss:
   version: 5.1.0-30.jpp6
@@ -19,7 +23,7 @@ jboss:
   server:
     ssl: true
   applications:
-    signserver:
+    signserver.ear:
       archive: /opt/signserver/lib/signserver.ear
 
 signserver:

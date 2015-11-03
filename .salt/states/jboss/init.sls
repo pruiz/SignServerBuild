@@ -82,6 +82,6 @@ jbossas:
 {% endif %}
 
 {% for name, data in apps %}
-{{ macros.application(name, data) }}
+{{ macros.deploy_link(name, data) }}
 {% endfor %}
 
