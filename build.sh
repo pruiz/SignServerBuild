@@ -8,6 +8,8 @@ declare -r -x SOURCES="${SWD##*/}"
 declare -r -x PROJECT=SignServer
 declare BUILDDIR=${WORKSPACE}
 
+SWD_REVNUM=$(cd "${SWD}"; git rev-list HEAD|wc -l)
+
 if [[ -z "${GIT_BRANCH}" ]]; then
   if [[ -e "${SRCDIR}/.git" ]]; then
     GIT_BRANCH=$(cd "${SRCDIR}"; git rev-parse --abbrev-ref HEAD)
@@ -108,7 +110,7 @@ function build ()
 
   rpmbuild -bb \
           --define "version $(echo ${VERSION_TAG}|rev|cut -d. -f 2-|rev)" \
-          --define "release $(echo ${VERSION_TAG}|rev|cut -d. -f -1|rev)" \
+          --define "release $(echo ${VERSION_TAG}|rev|cut -d. -f -1|rev).${SWD_REVNUM}" \
           --define "_topdir ${BUILDDIR}" \
           --define "_builddir ${BUILDDIR}/signserver" \
 	  --define "full_version_string ${VERSION_STRING}" \

@@ -74,13 +74,18 @@ mkdir -p "$OUTDIR"/{bin,conf}
 cp bin/{client.sh,signclient,signserver,signserver-db,stresstest,randomtest}  "$OUTDIR/bin"
 cp -a lib  "$OUTDIR/"
 rm -f "$OUTDIR"/lib/SignServer-Module-*
-#rm -f "$OUTDIR"/lib/SignServer-ejb-*
-rm -f "$OUTDIR"/lib/SignServer-Lib-*
+rm -f "$OUTDIR"/lib/SignServer-Lib-iText.jar
+rm -f "$OUTDIR"/lib/SignServer-Lib-ODFDOM.jar
+rm -f "$OUTDIR"/lib/SignServer-Lib-OpenXML4J.jar
 rm -f "$OUTDIR"/lib/SignServer-war-*
 rm -f "$OUTDIR"/lib/SignServer-Server.jar
 install -C -D "conf/log4j.properties" "${OUTDIR}/conf/log4j.properties"
 install -C -D "conf/signserver_cli.properties.samples" "${OUTDIR}/conf/signserver_cli.properties"
+install -C -D "conf/jboss/jndi.properties" "${OUTDIR}/conf/jboss/jndi.properties"
 touch "${RPM_BUILD_ROOT}/etc/signserver/signserver.conf"
+
+# Fix signserver CLI command.
+sed -i -e 's;^OPTIONAL_CLASSPATH=.*;OPTIONAL_CLASSPATH=$(find ${APPSRV_HOME}/client/ | tr "\n" ":" |sed -e "s,:\$,,g");g' "$OUTDIR/bin/signserver"
 
 #=============================================================================
 
