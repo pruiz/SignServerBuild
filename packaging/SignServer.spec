@@ -74,7 +74,7 @@ mkdir -p "$OUTDIR"/{bin,conf}
 cp bin/{client.sh,signclient,signserver,signserver-db,stresstest,randomtest}  "$OUTDIR/bin"
 cp -a lib  "$OUTDIR/"
 rm -f "$OUTDIR"/lib/SignServer-Module-*
-rm -f "$OUTDIR"/lib/SignServer-ejb-*
+#rm -f "$OUTDIR"/lib/SignServer-ejb-*
 rm -f "$OUTDIR"/lib/SignServer-Lib-*
 rm -f "$OUTDIR"/lib/SignServer-war-*
 rm -f "$OUTDIR"/lib/SignServer-Server.jar
