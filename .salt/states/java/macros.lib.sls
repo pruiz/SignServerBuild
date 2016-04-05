@@ -8,6 +8,7 @@
 {{ file }}:
   file.managed:
     - source: salt://java/files/properties
+    - makedirs: True
     - template: jinja
     - context:
       properties: {{ props|yaml }}
