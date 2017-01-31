@@ -27,20 +27,10 @@ Vagrant.configure(2) do |config|
   # argument is a set of non-required options.
   config.vm.synced_folder ".salt", "/srv/salt", create: true, owner: "root", group: "root"
 
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
+  # Ensure we use linked-clones under parallels.
+  config.vm.provider "parallels" do |prov|
+    prov.use_linked_clone = true
+  end
 
   config.ssh.forward_agent = true
   config.ssh.forward_x11 = true
