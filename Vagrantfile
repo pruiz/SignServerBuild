@@ -27,9 +27,9 @@ Vagrant.configure(2) do |config|
   # argument is a set of non-required options.
   config.vm.synced_folder ".salt", "/srv/salt", create: true, owner: "root", group: "root"
 
-  # Ensure we use linked-clones under parallels.
+  # Ensure we uselinked-clones under parallels.
   config.vm.provider "parallels" do |prov|
-    prov.use_linked_clone = true
+     if prov.respond_to?("linked_clone") then prov.linked_clone else prov.use_linked_clone end
   end
 
   config.ssh.forward_agent = true

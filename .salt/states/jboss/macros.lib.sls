@@ -24,7 +24,7 @@
   file.managed:
     - name: /var/lib/jbossas/server/default/deploy/{{ name }}
     - source: {{ data.source }}
-{% for key,value in data.context|default({}).iteritems() %}
+{% for key,value in (data.context|default({}))|dictsort %}
       {{ key }}: {{ value|yaml }}
 {% endfor %}
     - require:
