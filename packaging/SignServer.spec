@@ -56,7 +56,7 @@ SignServer's client commandline tools, version: %{full_version_string}
 export JBOSS_HOME="/var/lib/jbossas"
 export APPSRV_HOME=$JBOSS_HOME
 export ANT_HOME=/usr/share/ant
-export ANT_OPTS="-Xmx256m -XX:MaxPermSize=128m"
+export ANT_OPTS="-Xmx256m -XX:MaxPermSize=128m -Dhealthcheck.authorizedips=ANY"
 export SIGNSERVER_HOME=/opt/signserver
 export SIGNSERVER_NODEID=srv.signserver.dev
 
